@@ -1,0 +1,18 @@
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+body {
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+.text-pink-500 {
+    color: #ff6f61 !important;
+}
+.text-pink-600 {
+    color: #e84393 !important;
+}
