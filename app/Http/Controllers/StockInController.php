@@ -43,36 +43,44 @@ class StockInController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'ProdukId' => 'required|exists:produks,ProdukId',
-            'SupplierId' => 'required|exists:suppliers,SupplierId',
-            'Jumlah' => 'required|integer|min:1',
-            'Harga' => 'required|numeric|min:0',
-            'Tgl' => 'required|date',
-            'Kadaluarsa' => 'required|date',
+            'ProdukId.*' => 'required|exists:produks,ProdukId',
+            'SupplierId.*' => 'required|exists:suppliers,SupplierId',
+            'Jumlah.*' => 'required|integer|min:1',
+            'Harga.*' => 'required',
+            'Tgl.*' => 'required|date',
+            'Kadaluarsa.*' => 'required|date',
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        // Menghapus titik dari harga dan mengonversi ke integer
-        $harga = (int) str_replace('.', '', $request->Harga);
+        $produkIds = $request->ProdukId;
+        $jumlahs = $request->Jumlah;
+        $hargas = $request->Harga;
+        $tgls = $request->Tgl;
+        $kadaluarsas = $request->Kadaluarsa;
+        $supplierIds = $request->SupplierId;
 
-        $stockIn = StockIn::create([
-            'ProdukId' => $request->ProdukId,
-            'SupplierId' => $request->SupplierId,
-            'Jumlah' => $request->Jumlah,
-            'Harga' => $harga,
-            'Tgl' => $request->Tgl,
-            'Kadaluarsa' => $request->Kadaluarsa,
-        ]);
-
-        $produk = Produk::findOrFail($request->ProdukId);
-        $produk->stok += $request->Jumlah;
-        $produk->save();
+        foreach ($produkIds as $index => $produkId) {
+            $harga = (int) str_replace('.', '', $hargas[$index]);
         
-        session()->flash('success', 'Barang Masuk berhasil ditambahkan!');
+            $stockIn = StockIn::create([
+                'ProdukId' => $produkId,
+                'SupplierId' => $supplierIds[$index],
+                'Jumlah' => $jumlahs[$index],
+                'Harga' => $harga,
+                'Tgl' => $tgls[$index],
+                'Kadaluarsa' => $kadaluarsas[$index],
+            ]);
+        
+            // Update stok produk
+            $produk = Produk::findOrFail($produkId);
+            $produk->stok += $jumlahs[$index];
+            $produk->save();
+        }        
 
+        session()->flash('success', 'Beberapa produk berhasil ditambahkan ke stok masuk!');
         return redirect()->route('stock_ins.index');
     }
 

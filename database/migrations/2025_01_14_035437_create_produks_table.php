@@ -15,12 +15,13 @@ class CreateProduksTable extends Migration
     {
         Schema::create('produks', function (Blueprint $table) {
             $table->bigIncrements('ProdukId');
-            $table->string('KodeProduk', 10);
+            $table->string('KodeProduk', 10)->unique();
             $table->string('NamaProduk', 100);
             $table->unsignedBigInteger('KategoriId');
             $table->unsignedBigInteger('UnitId');
             $table->decimal('Harga', 10, 2);
             $table->integer('stok')->default(0);
+            $table->string('GambarProduk')->nullable();
             $table->timestamps();
 
             $table->foreign('KategoriId')->references('KategoriId')->on('kategoris')->onDelete('cascade');

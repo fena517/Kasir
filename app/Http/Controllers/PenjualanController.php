@@ -80,7 +80,7 @@ class PenjualanController extends Controller
 {
     $request->validate([
         'TanggalPenjualan' => 'required|date',
-        'PelangganId' => 'required|exists:pelanggans,PelangganId',
+        'PelangganId' => 'nullable|exists:pelanggans,PelangganId',
         'ProdukId' => 'required|array|min:1',
         'ProdukId.*' => 'exists:produks,ProdukId',
         'JumlahProduk' => 'required|array',
@@ -91,7 +91,7 @@ class PenjualanController extends Controller
     try {
         $penjualan = Penjualan::create([
             'TanggalPenjualan' => $request->TanggalPenjualan,
-            'PelangganId' => $request->PelangganId,
+            'PelangganId' => $request->PelangganId, 
             'TotalHarga' => 0,
         ]);
 
@@ -167,7 +167,7 @@ class PenjualanController extends Controller
         $request->validate([
             'TanggalPenjualan' => 'required',
             'TotalHarga' => 'required|numeric|min:0',
-            'PelangganId' => 'required|exists:pelanggans,PelangganId',
+            'PelangganId' => 'nullable|exists:pelanggans,PelangganId',
         ]);
 
         $penjualan = Penjualan::findOrFail($id);

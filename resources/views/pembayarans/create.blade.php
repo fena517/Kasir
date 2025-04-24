@@ -9,7 +9,7 @@
         <div class="card-body">
             <h5 class="card-title">Detail Penjualan</h5>
             <p><strong>Tanggal Penjualan:</strong> {{ date('d-m-Y', strtotime($penjualan->TanggalPenjualan)) }}</p>
-            <p><strong>Pelanggan:</strong> {{ $penjualan->pelanggan->NamaPelanggan }}</p>
+            <p><strong>Pelanggan:</strong> {{ $penjualan->pelanggan->NamaPelanggan ?? 'Pelanggan Tidak Ditemukan' }}</p>
             
             <h6 class="mt-3">Rincian Pembelian:</h6>
             <table class="table table-bordered">

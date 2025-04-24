@@ -44,13 +44,12 @@
                                     @endforeach
                                 </td>
                                 <td>Rp. {{ number_format($penjualan->TotalHarga, 2, ',', '.') }}</td>
-                                <td>{{ $penjualan->pelanggan->NamaPelanggan }}</td>
+                                <td>
+                                    {{ $penjualan->pelanggan ? $penjualan->pelanggan->NamaPelanggan : 'Pelanggan Tidak Ditemukan' }}
+                                </td>
                                 <td>
                                     @if(Auth::check() && Auth::user()->role == 'admin') 
                                     <div class="d-flex gap-2 justify-content-center">
-                                        <a href="{{ route('penjualans.show', $penjualan->PenjualanId) }}" class="btn btn-warning btn-sm" title="Detail">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
                                         @if($penjualan->pembayaran)
                                             <a href="{{ route('pembayarans.show', $penjualan->pembayaran->PembayaranId) }}" class="btn btn-success btn-sm" title="Struk">
                                                 <i class="fas fa-receipt"></i>

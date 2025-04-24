@@ -20,11 +20,13 @@
 
         <div class="mb-3">
             <label for="PelangganId" class="form-label">Pilih Pelanggan</label>
-            <select class="form-control" name="PelangganId" required>
-                <option value="">-- Pilih Pelanggan --</option>
-                @foreach($pelanggans as $pelanggan)
-                    <option value="{{ $pelanggan->PelangganId }}">{{ $pelanggan->NamaPelanggan }}</option>
-                @endforeach
+            <select class="form-control" name="PelangganId">
+            <option value="">-- Pilih Pelanggan --</option>
+            @foreach($pelanggans as $pelanggan)
+                <option value="{{ $pelanggan->PelangganId }}" {{ old('PelangganId') == $pelanggan->PelangganId ? 'selected' : '' }}>
+                    {{ $pelanggan->NamaPelanggan }}
+                </option>
+            @endforeach
             </select>
         </div>
 
@@ -36,7 +38,7 @@
                     <option value="">-- Pilih Produk --</option>
                     @foreach($produks as $produk)
                         <option value="{{ $produk->ProdukId }}" data-harga="{{ $produk->Harga }}">
-                            {{ $produk->NamaProduk }} - Rp {{ number_format($produk->Harga, 0, ',', '.') }}
+                            {{ $produk->NamaProduk }} 
                         </option>
                     @endforeach
                 </select>

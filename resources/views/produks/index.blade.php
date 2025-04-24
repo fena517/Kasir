@@ -23,6 +23,7 @@
                 <thead class="table-dark">
                     <tr>
                         <th>No</th>
+                        <th>Gambar</th>
                         <th>Nama Produk</th>
                         <th>Harga</th>
                         <th>Stok</th>
@@ -36,6 +37,13 @@
                     @foreach ($produks->sortByDesc('ProdukId') as $produk)
                         <tr>
                             <td>{{ ($produks->currentPage() - 1) * $produks->perPage() + $loop->iteration }}</td>
+                            <td>
+                                @if($produk->GambarProduk)
+                                    <img src="{{ asset($produk->GambarProduk) }}" alt="Gambar Produk" width="60" height="60">
+                                @else
+                                    <span>-</span>
+                                @endif
+                            </td>
                             <td>{{ $produk->NamaProduk }}</td>
                             <td>Rp {{ number_format((int) $produk->Harga, 0, ',', '.') }}</td>
                             <td>{{ $produk->stok }}</td>
@@ -156,6 +164,10 @@
     .btn-danger:hover {
         background-color: #c9302c;
         border-color: #ac2925;
+    }
+    img {
+        object-fit: cover;
+        border-radius: 5px;
     }
 </style>
 @endsection

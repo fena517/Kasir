@@ -10,137 +10,122 @@ use Illuminate\Support\Facades\Validator;
 
 class ProdukController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
         $produks = Produk::orderBy('NamaProduk', 'asc')->paginate(10);
         return view('produks.index', compact('produks'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         $kategoris = Kategori::all();
         $units = Unit::all();
-        return view ('produks.create', compact('kategoris', 'units'));
+        return view('produks.create', compact('kategoris', 'units'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
-{
-    $validator = Validator::make($request->all(), [
-        'KodeProduk' => 'required|string|max:10',
-        'NamaProduk' => 'required|string|max:50',
-        'KategoriId' => 'required|exists:kategoris,KategoriId',
-        'UnitId' => 'required|exists:units,UnitId',
-        'Harga' => 'required|numeric|min:0',
-        'stok' => 'required|numeric|min:0',
-    ]);
-    
-    if ($validator->fails()) {
-        return redirect()->back()->withErrors($validator)->withInput();
+    {
+        $validator = Validator::make($request->all(), [
+            'KodeProduk'   => 'required|string|max:10|unique:produks,KodeProduk',
+            'NamaProduk'   => 'required|string|max:100',
+            'KategoriId'   => 'required|exists:kategoris,KategoriId',
+            'UnitId'       => 'required|exists:units,UnitId',
+            'Harga'        => 'required|numeric|min:0',
+            'stok'         => 'required|integer|min:0',
+            'GambarProduk' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        $harga = str_replace('.', '', $request->Harga);
+
+        $produk = new Produk();
+        $produk->KodeProduk = $request->KodeProduk;
+        $produk->NamaProduk = $request->NamaProduk;
+        $produk->KategoriId = $request->KategoriId;
+        $produk->UnitId = $request->UnitId;
+        $produk->Harga = $harga;
+        $produk->stok = $request->stok;
+
+        if ($request->hasFile('GambarProduk')) {
+            $file = $request->file('GambarProduk');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('images/produk'), $filename);
+            $produk->GambarProduk = 'images/produk/' . $filename;
+        }
+
+        $produk->save();
+
+        return redirect()->route('produks.index')->with('success', 'Produk berhasil ditambahkan!');
     }
 
-    // Hapus titik sebelum disimpan ke database
-    $harga = str_replace('.', '', $request->Harga);
-    
-    Produk::create([
-        'KodeProduk' => $request->KodeProduk,
-        'NamaProduk' => $request->NamaProduk,
-        'KategoriId' => $request->KategoriId,
-        'UnitId' => $request->UnitId,
-        'Harga' => $harga,
-        'stok' => $request->stok,
-    ]);
-
-    session()->flash('success', 'Produk berhasil ditambahkan!');
-    return redirect()->route('produks.index');
-}
-
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\produk  $produk
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
         $produk = Produk::findOrFail($id);
         return view('produks.show', compact('produk'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\produk  $produk
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         $produk = Produk::findOrFail($id);
         $kategoris = Kategori::all();
         $units = Unit::all();
-        
         return view('produks.edit', compact('produk', 'kategoris', 'units'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\produk  $produk
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
-{
-    $request->validate([
-        'KodeProduk' => 'required|string|max:10',
-        'NamaProduk' => 'required|string|max:50',
-        'KategoriId' => 'required|exists:kategoris,KategoriId',
-        'UnitId' => 'required|exists:units,UnitId',
-        'Harga' => 'required|numeric|min:0',
-        'stok' => 'required|numeric|min:0',
-    ]);
+    {
+        $produk = Produk::findOrFail($id);
 
-    $harga = str_replace('.', '', $request->Harga);
+        $request->validate([
+            'KodeProduk'   => 'required|string|max:10|unique:produks,KodeProduk,' . $id . ',ProdukId',
+            'NamaProduk'   => 'required|string|max:100',
+            'KategoriId'   => 'required|exists:kategoris,KategoriId',
+            'UnitId'       => 'required|exists:units,UnitId',
+            'Harga'        => 'required|numeric|min:0',
+            'stok'         => 'required|integer|min:0',
+            'GambarProduk' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
 
-    $produk = Produk::findOrFail($id);
-    $produk->update([
-        'KodeProduk' => $request->KodeProduk,
-        'NamaProduk' => $request->NamaProduk,
-        'KategoriId' => $request->KategoriId,
-        'UnitId' => $request->UnitId,
-        'Harga' => $harga,
-        'stok' => $request->stok,
-    ]);
+        $harga = str_replace('.', '', $request->Harga);
 
-    return redirect()->route('produks.index')->with('success', 'Produk berhasil diperbarui');
-}
+        $produk->KodeProduk = $request->KodeProduk;
+        $produk->NamaProduk = $request->NamaProduk;
+        $produk->KategoriId = $request->KategoriId;
+        $produk->UnitId = $request->UnitId;
+        $produk->Harga = $harga;
+        $produk->stok = $request->stok;
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\produk  $produk
-     * @return \Illuminate\Http\Response
-     */
+        if ($request->hasFile('GambarProduk')) {
+            // Hapus gambar lama jika ada
+            if ($produk->GambarProduk && file_exists(public_path($produk->GambarProduk))) {
+                unlink(public_path($produk->GambarProduk));
+            }
+
+            $file = $request->file('GambarProduk');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('images/produk'), $filename);
+            $produk->GambarProduk = 'images/produk/' . $filename;
+        }
+
+        $produk->save();
+
+        return redirect()->route('produks.index')->with('success', 'Produk berhasil diperbarui!');
+    }
+
     public function destroy($id)
     {
         $produk = Produk::findOrFail($id);
+
+        // Hapus gambar jika ada
+        if ($produk->GambarProduk && file_exists(public_path($produk->GambarProduk))) {
+            unlink(public_path($produk->GambarProduk));
+        }
+
         $produk->delete();
-        return redirect()->route('produks.index')->with('success', 'Pelanggan berhasil dihapus.');
+
+        return redirect()->route('produks.index')->with('success', 'Produk berhasil dihapus.');
     }
 }

@@ -99,7 +99,7 @@ class SupplierController extends Controller
      * @param  \App\supplier  $supplier
      * @return \Illuminate\Http\Response
      */
-    public function destroy(supplier $supplier)
+    public function destroy($id)
     {
         $supplier = Supplier::findOrFail($id);
         $supplier->delete();

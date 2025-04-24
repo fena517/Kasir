@@ -15,7 +15,8 @@ class Produk extends Model
         'KategoriId',
         'UnitId',
         'Harga',
-        'stok'
+        'stok',
+        'GambarProduk'
     ]; 
 
     public function stockIns()

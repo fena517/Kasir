@@ -26,7 +26,6 @@
                         <th>Jumlah</th>
                         <th>Tanggal</th>
                         <th>Alasan</th>
-                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody id="stock-table-body">
@@ -37,16 +36,7 @@
                             <td>{{ $stock_out->Jumlah }}</td>
                             <td>{{ \Carbon\Carbon::parse($stock_out->Tgl)->format('d/m/Y') }}</td>
                             <td>{{ $stock_out->Alasan }}</td>
-                            <td>    
-                                <div class="d-flex gap-2">
-                                    <form action="{{ route('stock_outs.destroy', $stock_out->KeluarId) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?');" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>                                        
-                                    </form>
-                                </div>
+                            <td>
                             </td>
                         </tr>
                     @endforeach
